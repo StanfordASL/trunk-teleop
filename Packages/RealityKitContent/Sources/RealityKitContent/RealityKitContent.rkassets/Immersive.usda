@@ -1,0 +1,527 @@
+#usda 1.0
+(
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+reorder rootPrims = ["Root", "Parent3"]
+
+def Xform "Root" (
+    customData = {
+        float3 rotationEulerHint = (0, 0, 0)
+    }
+)
+{
+    reorder nameChildren = ["Base", "Parent3"]
+    quatf xformOp:orient = (1, 0, 0, 0)
+    float3 xformOp:translate = (0, 1.5, -1)
+    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+    def Sphere "Base" (
+        active = true
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        reorder nameChildren = ["Parent1", "PositionSetEntity", "X_Axis", "Z_Axis", "DefaultMaterial", "Segment1", "InputTarget"]
+        rel material:binding = </Root/Base/DefaultMaterial>
+        double radius = 0.01
+
+        def Material "DefaultMaterial"
+        {
+            token outputs:surface.connect = </Root/Base/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+            def Shader "DefaultSurfaceShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (1, 1, 1)
+                float inputs:roughness = 0.75
+                token outputs:surface
+            }
+        }
+
+        def RealityKitComponent "InputTarget"
+        {
+            bool allowsDirectInput = 0
+            bool allowsIndirectInput = 1
+            uniform token info:id = "RealityKit.InputTarget"
+        }
+
+        def Cylinder "Z_Axis" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                float3 rotationEulerHint = (4.7123885, -1.5707963, 0)
+            }
+        )
+        {
+            reorder nameChildren = ["X_Axis", "DefaultMaterial"]
+            uniform token axis = "Y"
+            double height = 0.33
+            rel material:binding = </Root/Base/Z_Axis/DefaultMaterial>
+            double radius = 0.0025
+            quatf xformOp:orient = (0.49712348, 0.49712354, -0.50286, 0.50285995)
+            float3 xformOp:scale = (0.99999994, 0.99999994, 0.99999994)
+            float3 xformOp:translate = (0.165, -0.0000015497208, 0.0025)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            def Material "DefaultMaterial"
+            {
+                token outputs:mtlx:surface
+                token outputs:realitykit:vertex
+                token outputs:surface.connect = </Root/Base/Z_Axis/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                def Shader "DefaultSurfaceShader"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (1, 1, 1)
+                    float inputs:roughness = 0.75
+                    token outputs:surface
+                }
+            }
+        }
+
+        def Cylinder "X_Axis" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+            customData = {
+                float3 rotationEulerHint = (-1.5707964, -0.07024922, 3.1415923)
+            }
+        )
+        {
+            uniform token axis = "Y"
+            double height = 0.1
+            rel material:binding = </Root/Base/X_Axis/DefaultMaterial>
+            double radius = 0.0025
+            float2 ui:nodegraph:node:pos = (20, 20)
+            int ui:nodegraph:node:stackingOrder = 1
+            quatf xformOp:orient = (0.024831884, 0.024831595, -0.7066706, 0.7066706)
+            float3 xformOp:scale = (0.99999964, 0.99999964, 0.99999964)
+            float3 xformOp:translate = (-0.0025, -0.000036001205, -0.05)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            def Material "DefaultMaterial"
+            {
+                token outputs:surface.connect = </Root/Base/X_Axis/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                def Shader "DefaultSurfaceShader"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (1, 1, 1)
+                    float inputs:roughness = 0.75
+                    token outputs:surface
+                }
+            }
+        }
+
+        def Sphere "PositionSetEntity" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </Root/Base/PositionSetEntity/DefaultMaterial>
+            double radius = 0.01
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (1, 1, 1)
+            float3 xformOp:translate = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            def Material "DefaultMaterial"
+            {
+                token outputs:surface.connect = </Root/Base/PositionSetEntity/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                def Shader "DefaultSurfaceShader"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (1, 1, 1)
+                    float inputs:roughness = 0.75
+                    token outputs:surface
+                }
+            }
+
+            def RealityKitComponent "InputTarget"
+            {
+                bool allowsDirectInput = 0
+                bool allowsIndirectInput = 1
+                uniform token info:id = "RealityKit.InputTarget"
+            }
+        }
+
+        def Sphere "Parent1" (
+            active = true
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            reorder nameChildren = ["DefaultMaterial", "Segment1"]
+            rel material:binding = </Root/Base/Parent1/DefaultMaterial>
+            double radius = 0.001
+            quatf xformOp:orient = (1, 0, 0, 0)
+            float3 xformOp:scale = (1, 1, 1)
+            float3 xformOp:translate = (0, 0, 0)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+            def Material "DefaultMaterial"
+            {
+                token outputs:surface.connect = </Root/Base/Parent1/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                def Shader "DefaultSurfaceShader"
+                {
+                    uniform token info:id = "UsdPreviewSurface"
+                    color3f inputs:diffuseColor = (1, 1, 1)
+                    float inputs:roughness = 0.75
+                    token outputs:surface
+                }
+            }
+
+            def Cylinder "Segment1" (
+                active = true
+                prepend apiSchemas = ["MaterialBindingAPI"]
+            )
+            {
+                reorder nameChildren = ["Parent2", "Segment2", "DefaultMaterial", "Disk1"]
+                uniform token axis = "Y"
+                double height = 0.11320000000000001
+                rel material:binding = </Root/Base/Parent1/Segment1/DefaultMaterial>
+                double radius = 0.02
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (1, 1, 1)
+                float3 xformOp:translate = (0, -0.056599975, 0)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Material "DefaultMaterial"
+                {
+                    token outputs:mtlx:surface
+                    token outputs:realitykit:vertex
+                    token outputs:surface.connect = </Root/Base/Parent1/Segment1/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                    def Shader "DefaultSurfaceShader"
+                    {
+                        uniform token info:id = "UsdPreviewSurface"
+                        color3f inputs:diffuseColor = (0.016804177, 0.198351, 1) (
+                            colorSpace = "srgb_texture"
+                        )
+                        color3f inputs:emissiveColor = (0.016804177, 0.198351, 1) (
+                            colorSpace = "srgb_texture"
+                        )
+                        float inputs:opacity = 0.5
+                        float inputs:roughness = 0.75
+                        token outputs:surface
+                    }
+                }
+
+                def Cylinder "Disk1" (
+                    active = true
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    reorder nameChildren = ["Disk1", "DefaultMaterial", "InputTarget", "Collider"]
+                    uniform token axis = "Y"
+                    double height = 0.015
+                    rel material:binding = </Root/Base/Parent1/Segment1/Disk1/DefaultMaterial>
+                    double radius = 0.025
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    float3 xformOp:translate = (0, -0.0566, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Material "DefaultMaterial"
+                    {
+                        token outputs:mtlx:surface
+                        token outputs:realitykit:vertex
+                        token outputs:surface.connect = </Root/Base/Parent1/Segment1/Disk1/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                        def Shader "DefaultSurfaceShader"
+                        {
+                            uniform token info:id = "UsdPreviewSurface"
+                            color3f inputs:diffuseColor = (0, 0, 0) (
+                                colorSpace = "srgb_texture"
+                            )
+                            float inputs:roughness = 0.75
+                            token outputs:surface
+                        }
+                    }
+
+                    def RealityKitComponent "InputTarget"
+                    {
+                        bool allowsDirectInput = 0
+                        bool allowsIndirectInput = 1
+                        uniform token info:id = "RealityKit.InputTarget"
+                    }
+
+                    def RealityKitComponent "Collider"
+                    {
+                        uint group = 1
+                        uniform token info:id = "RealityKit.Collider"
+                        uint mask = 4294967295
+                        token type = "Default"
+
+                        def RealityKitStruct "Shape"
+                        {
+                            float3 extent = (0.05, 0.015, 0.05)
+                            float height = 0.015
+                            float radius = 0.025
+                            token shapeType = "Capsule"
+
+                            def RealityKitStruct "pose"
+                            {
+                            }
+                        }
+                    }
+                }
+
+                def Sphere "Parent2" (
+                    active = true
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    reorder nameChildren = ["Disk2", "DefaultMaterial", "Segment2"]
+                    rel material:binding = </Root/Base/Parent1/Segment1/Parent2/DefaultMaterial>
+                    double radius = 0.001
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    float3 xformOp:translate = (0, -0.0566, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Material "DefaultMaterial"
+                    {
+                        token outputs:surface.connect = </Root/Base/Parent1/Segment1/Parent2/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                        def Shader "DefaultSurfaceShader"
+                        {
+                            uniform token info:id = "UsdPreviewSurface"
+                            color3f inputs:diffuseColor = (1, 1, 1)
+                            float inputs:roughness = 0.75
+                            token outputs:surface
+                        }
+                    }
+
+                    def Cylinder "Segment2" (
+                        active = true
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        reorder nameChildren = ["Parent3", "DefaultMaterial", "Disk2"]
+                        uniform token axis = "Y"
+                        double height = 0.11320000000000001
+                        rel material:binding = </Root/Base/Parent1/Segment1/Parent2/Segment2/DefaultMaterial>
+                        double radius = 0.02
+                        float2 ui:nodegraph:node:pos = (20, 20)
+                        int ui:nodegraph:node:stackingOrder = 1
+                        quatf xformOp:orient = (1, 0, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        float3 xformOp:translate = (0, -0.0566, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                        def Material "DefaultMaterial"
+                        {
+                            token outputs:mtlx:surface
+                            token outputs:realitykit:vertex
+                            token outputs:surface.connect = </Root/Base/Parent1/Segment1/Parent2/Segment2/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                            def Shader "DefaultSurfaceShader"
+                            {
+                                uniform token info:id = "UsdPreviewSurface"
+                                color3f inputs:diffuseColor = (0.016804177, 0.198351, 1) (
+                                    colorSpace = "srgb_texture"
+                                )
+                                color3f inputs:emissiveColor = (0.016804177, 0.198351, 1) (
+                                    colorSpace = "srgb_texture"
+                                )
+                                float inputs:opacity = 0.5
+                                float inputs:roughness = 0.75
+                                token outputs:surface
+                            }
+                        }
+
+                        def Sphere "Parent3" (
+                            active = true
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            reorder nameChildren = ["DefaultMaterial", "Segment3"]
+                            rel material:binding = </Root/Base/Parent1/Segment1/Parent2/Segment2/Parent3/DefaultMaterial>
+                            double radius = 0.001
+                            quatf xformOp:orient = (1, 0, 0, 0)
+                            float3 xformOp:scale = (1, 1, 1)
+                            float3 xformOp:translate = (0, -0.0566, 0)
+                            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                            def Material "DefaultMaterial"
+                            {
+                                token outputs:surface.connect = </Root/Base/Parent1/Segment1/Parent2/Segment2/Parent3/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                                def Shader "DefaultSurfaceShader"
+                                {
+                                    uniform token info:id = "UsdPreviewSurface"
+                                    color3f inputs:diffuseColor = (1, 1, 1)
+                                    float inputs:roughness = 0.75
+                                    token outputs:surface
+                                }
+                            }
+
+                            def Cylinder "Segment3" (
+                                active = true
+                                prepend apiSchemas = ["MaterialBindingAPI"]
+                            )
+                            {
+                                reorder nameChildren = ["Disk2", "DefaultMaterial", "Disk3"]
+                                uniform token axis = "Y"
+                                double height = 0.11320000000000001
+                                rel material:binding = </Root/Base/Parent1/Segment1/Parent2/Segment2/Parent3/Segment3/DefaultMaterial>
+                                double radius = 0.02
+                                float2 ui:nodegraph:node:pos = (40, 40)
+                                int ui:nodegraph:node:stackingOrder = 2
+                                quatf xformOp:orient = (1, 0, 0, 0)
+                                float3 xformOp:scale = (1, 1, 1)
+                                float3 xformOp:translate = (0, -0.0566, 0)
+                                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                                def Material "DefaultMaterial"
+                                {
+                                    token outputs:mtlx:surface
+                                    token outputs:realitykit:vertex
+                                    token outputs:surface.connect = </Root/Base/Parent1/Segment1/Parent2/Segment2/Parent3/Segment3/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                                    def Shader "DefaultSurfaceShader"
+                                    {
+                                        uniform token info:id = "UsdPreviewSurface"
+                                        color3f inputs:diffuseColor = (0.016804177, 0.198351, 1) (
+                                            colorSpace = "srgb_texture"
+                                        )
+                                        color3f inputs:emissiveColor = (0.016804177, 0.198351, 1) (
+                                            colorSpace = "srgb_texture"
+                                        )
+                                        float inputs:opacity = 0.5
+                                        float inputs:roughness = 0.75
+                                        token outputs:surface
+                                    }
+                                }
+
+                                def Cylinder "Disk3" (
+                                    active = true
+                                    prepend apiSchemas = ["MaterialBindingAPI"]
+                                )
+                                {
+                                    uniform token axis = "Y"
+                                    double height = 0.015
+                                    rel material:binding = </Root/Base/Parent1/Segment1/Parent2/Segment2/Parent3/Segment3/Disk3/DefaultMaterial>
+                                    double radius = 0.025
+                                    quatf xformOp:orient = (1, 0, 0, 0)
+                                    float3 xformOp:scale = (1, 1, 1)
+                                    float3 xformOp:translate = (0, -0.0566, 0)
+                                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                                    def Material "DefaultMaterial"
+                                    {
+                                        token outputs:mtlx:surface
+                                        token outputs:realitykit:vertex
+                                        token outputs:surface.connect = </Root/Base/Parent1/Segment1/Parent2/Segment2/Parent3/Segment3/Disk3/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                                        def Shader "DefaultSurfaceShader"
+                                        {
+                                            uniform token info:id = "UsdPreviewSurface"
+                                            color3f inputs:diffuseColor = (0, 0, 0) (
+                                                colorSpace = "srgb_texture"
+                                            )
+                                            float inputs:roughness = 0.75
+                                            token outputs:surface
+                                        }
+                                    }
+
+                                    def RealityKitComponent "InputTarget"
+                                    {
+                                        bool allowsDirectInput = 0
+                                        bool allowsIndirectInput = 1
+                                        uniform token info:id = "RealityKit.InputTarget"
+                                    }
+
+                                    def RealityKitComponent "Collider"
+                                    {
+                                        uint group = 1
+                                        uniform token info:id = "RealityKit.Collider"
+                                        uint mask = 4294967295
+                                        token type = "Default"
+
+                                        def RealityKitStruct "Shape"
+                                        {
+                                            float3 extent = (0.05, 0.015, 0.05)
+                                            float height = 0.015
+                                            float radius = 0.025
+                                            token shapeType = "Capsule"
+
+                                            def RealityKitStruct "pose"
+                                            {
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        def Cylinder "Disk2" (
+                            active = true
+                            prepend apiSchemas = ["MaterialBindingAPI"]
+                        )
+                        {
+                            uniform token axis = "Y"
+                            double height = 0.015
+                            rel material:binding = </Root/Base/Parent1/Segment1/Parent2/Segment2/Disk2/DefaultMaterial>
+                            double radius = 0.025
+                            float2 ui:nodegraph:node:pos = (20, 20)
+                            int ui:nodegraph:node:stackingOrder = 1
+                            quatf xformOp:orient = (1, 0, 0, 0)
+                            float3 xformOp:scale = (1, 1, 1)
+                            float3 xformOp:translate = (0, -0.056599975, 0)
+                            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                            def Material "DefaultMaterial"
+                            {
+                                token outputs:mtlx:surface
+                                token outputs:realitykit:vertex
+                                token outputs:surface.connect = </Root/Base/Parent1/Segment1/Parent2/Segment2/Disk2/DefaultMaterial/DefaultSurfaceShader.outputs:surface>
+
+                                def Shader "DefaultSurfaceShader"
+                                {
+                                    uniform token info:id = "UsdPreviewSurface"
+                                    color3f inputs:diffuseColor = (0, 0, 0) (
+                                        colorSpace = "srgb_texture"
+                                    )
+                                    float inputs:roughness = 0.75
+                                    token outputs:surface
+                                }
+                            }
+
+                            def RealityKitComponent "InputTarget"
+                            {
+                                bool allowsDirectInput = 0
+                                bool allowsIndirectInput = 1
+                                uniform token info:id = "RealityKit.InputTarget"
+                            }
+
+                            def RealityKitComponent "Collider"
+                            {
+                                uint group = 1
+                                uniform token info:id = "RealityKit.Collider"
+                                uint mask = 4294967295
+                                token type = "Default"
+
+                                def RealityKitStruct "Shape"
+                                {
+                                    float3 extent = (0.05, 0.015, 0.05)
+                                    float height = 0.015
+                                    float radius = 0.025
+                                    token shapeType = "Capsule"
+
+                                    def RealityKitStruct "pose"
+                                    {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

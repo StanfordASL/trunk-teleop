@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CD123A5B2C7FEB78003649AB /* GRPC in Frameworks */ = {isa = PBXBuildFile; productRef = CD123A5A2C7FEB78003649AB /* GRPC */; };
+		CD123A5D2C7FEB93003649AB /* protoc-gen-grpc-swift in Frameworks */ = {isa = PBXBuildFile; productRef = CD123A5C2C7FEB93003649AB /* protoc-gen-grpc-swift */; };
 		CD555DB92C66BCFC009939D8 /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = CD555DB82C66BCFC009939D8 /* RealityKitContent */; };
 /* End PBXBuildFile section */
 
@@ -57,7 +59,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD123A5B2C7FEB78003649AB /* GRPC in Frameworks */,
 				CD555DB92C66BCFC009939D8 /* RealityKitContent in Frameworks */,
+				CD123A5D2C7FEB93003649AB /* protoc-gen-grpc-swift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,12 +75,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CD123A592C7FEB67003649AB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		CD555DAA2C66BCFC009939D8 = {
 			isa = PBXGroup;
 			children = (
 				CD555DB52C66BCFC009939D8 /* trunkIK */,
 				CD555DB62C66BCFC009939D8 /* Packages */,
 				CD555DD12C66BCFD009939D8 /* trunkIKTests */,
+				CD123A592C7FEB67003649AB /* Frameworks */,
 				CD555DB42C66BCFC009939D8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -119,6 +131,8 @@
 			name = trunkIK;
 			packageProductDependencies = (
 				CD555DB82C66BCFC009939D8 /* RealityKitContent */,
+				CD123A5A2C7FEB78003649AB /* GRPC */,
+				CD123A5C2C7FEB93003649AB /* protoc-gen-grpc-swift */,
 			);
 			productName = trunkIK;
 			productReference = CD555DB32C66BCFC009939D8 /* trunkIK.app */;
@@ -175,6 +189,9 @@
 			);
 			mainGroup = CD555DAA2C66BCFC009939D8;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CD123A1F2C7FE583003649AB /* XCRemoteSwiftPackageReference "grpc-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CD555DB42C66BCFC009939D8 /* Products */;
 			projectDirPath = "";
@@ -472,7 +489,28 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		CD123A1F2C7FE583003649AB /* XCRemoteSwiftPackageReference "grpc-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/grpc/grpc-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.23.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		CD123A5A2C7FEB78003649AB /* GRPC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD123A1F2C7FE583003649AB /* XCRemoteSwiftPackageReference "grpc-swift" */;
+			productName = GRPC;
+		};
+		CD123A5C2C7FEB93003649AB /* protoc-gen-grpc-swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CD123A1F2C7FE583003649AB /* XCRemoteSwiftPackageReference "grpc-swift" */;
+			productName = "protoc-gen-grpc-swift";
+		};
 		CD555DB82C66BCFC009939D8 /* RealityKitContent */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = RealityKitContent;

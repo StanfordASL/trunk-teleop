@@ -14,7 +14,8 @@ struct ContentView: View {
     @Environment(AppStateManager.self) var appStateManager: AppStateManager
     @Environment(Shapes.self) var shapes: Shapes
     @Environment(AppModel.self) var appModel: AppModel
-    @Environment(TrunkState.self) var trunkState: TrunkState
+    
+    @StateObject var trunkState = DataManager.shared.trunkState
     
     @Binding var isPositionConfirmed: Bool
     @Binding var isRotationConfirmed: Bool
@@ -30,9 +31,10 @@ struct ContentView: View {
                 .font(.title) // Use .title2 or .title3 for smaller titles
                 .fontWeight(.bold)
                 .padding()
+            Text("You're on IP address [\(getIPAddress())]")
+                .font(.title2)
             
-            ImmersiveView(isPositionConfirmed: $isPositionConfirmed, isRotationConfirmed: $isRotationConfirmed)
-                .environment(shapes)
+            .environment(shapes)
             //will this work
                 .onAppear{
                     if runCount == 0 {
@@ -51,10 +53,12 @@ struct ContentView: View {
                 Text(" ")
                 Text("Click 'Confirm Position' when set")
                 Text(" ")
+                
                 Button("Confirm Position") {
                     isPositionConfirmed = true
                     appStateManager.currentState = .rotating
                     updateHoverEffects(for: shapes, state: appStateManager.currentState)
+                    print("current state: rotation")
                 }
                 .padding()
                 .foregroundColor(.white)
@@ -174,12 +178,36 @@ func updateHoverEffects(for shapes: Shapes, state: AppState) {
        }
        // Remove hover from baseEntity
        shapes.positionSetEntity.components.remove(HoverEffectComponent.self)
-       
-       // remove inputtargetcomponent from base entity - this isnt the problem, it's the gesture
-//       shapes.baseEntity.components.remove(InputTargetComponent.self)
-//       // and collisioncomponent
-//       shapes.baseEntity.components.remove(CollisionComponent.self)
    }
+}
+
+func getIPAddress() -> String {
+    var address: String?
+    var ifaddr: UnsafeMutablePointer<ifaddrs>? = nil
+    if getifaddrs(&ifaddr) == 0 {
+        var ptr = ifaddr
+        while ptr != nil {
+            defer { ptr = ptr?.pointee.ifa_next }
+
+            guard let interface = ptr?.pointee else { return "" }
+            let addrFamily = interface.ifa_addr.pointee.sa_family
+            if addrFamily == UInt8(AF_INET) || addrFamily == UInt8(AF_INET6) {
+
+                // wifi = ["en0"]
+                // wired = ["en2", "en3", "en4"]
+                // cellular = ["pdp_ip0","pdp_ip1","pdp_ip2","pdp_ip3"]
+
+                let name: String = String(cString: (interface.ifa_name))
+                if  name == "en0" || name == "en2" || name == "en3" || name == "en4" || name == "pdp_ip0" || name == "pdp_ip1" || name == "pdp_ip2" || name == "pdp_ip3" {
+                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                    getnameinfo(interface.ifa_addr, socklen_t((interface.ifa_addr.pointee.sa_len)), &hostname, socklen_t(hostname.count), nil, socklen_t(0), NI_NUMERICHOST)
+                    address = String(cString: hostname)
+                }
+            }
+        }
+        freeifaddrs(ifaddr)
+    }
+    return address ?? ""
 }
 
                                        

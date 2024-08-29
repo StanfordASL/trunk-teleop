@@ -9,10 +9,16 @@ import SwiftUI
 import RealityKit
 
 @Observable class Shapes {
-    var baseEntity = Entity()
-    var positionSetEntity = Entity()
-    var x_axis = Entity()
-    var z_axis = Entity()
+    var baseEntity = ModelEntity(mesh: .generateSphere(radius:0.01), materials: [SimpleMaterial(color: .white, isMetallic: false)])
+    var rootJoint = ModelEntity(mesh: .generateSphere(radius:0.01), materials: [SimpleMaterial(color: .red, isMetallic: false)])
+    
+    var positionSetEntity = ModelEntity(mesh: .generateSphere(radius:0.0125), materials: [SimpleMaterial(color: .white, isMetallic: false)])
+    var x_axis = ModelEntity(mesh: .generateCylinder(height:0.15, radius:0.005), materials: [SimpleMaterial(color: .white, isMetallic: false)])
+    var z_axis = ModelEntity(mesh: .generateCylinder(height:0.45, radius:0.005), materials: [SimpleMaterial(color: .white, isMetallic: false)])
+    
+    var disk1 = ModelEntity(mesh: .generateCylinder(height:0.015, radius:0.025), materials: [SimpleMaterial(color: .black, isMetallic: false)])
+    var disk2 = ModelEntity(mesh: .generateCylinder(height:0.015, radius:0.025), materials: [SimpleMaterial(color: .black, isMetallic: false)])
+    var disk3 = ModelEntity(mesh: .generateCylinder(height:0.015, radius:0.025), materials: [SimpleMaterial(color: .black, isMetallic: false)])
     
     var segment1 = Entity()
     var segment2 = Entity()
@@ -22,12 +28,9 @@ import RealityKit
     var parent2 = Entity()
     var parent3 = Entity()
 
-    var disk1 = Entity()
-    var disk2 = Entity()
-    var disk3 = Entity()
 }
 
-@Observable class TrunkState {
+class TrunkState: ObservableObject{
     // for base positioning
     var lastBasePosition: SIMD3<Float>? = nil
     var recentBasePositions: [SIMD3<Float>] = []
@@ -39,6 +42,12 @@ import RealityKit
     
     var lastDirections: [SIMD3<Float>?] = [nil, nil, nil]
     var currentDirections: [SIMD3<Float>] = [SIMD3<Float>(0,-1,0), SIMD3<Float>(0,-1,0), SIMD3<Float>(0,-1,0)] // start off vertical
+    
+    // in optitrack coordinates
+    var diskPositions: [String : SIMD3<Float>] = ["disk1": SIMD3<Float>(0,0,0),
+                                                  "disk2": SIMD3<Float>(0,0,0),
+                                                  "disk3": SIMD3<Float>(0,0,0)]
+    
 }
 
 enum AppState {
@@ -53,14 +62,21 @@ enum AppState {
 
 @main
 struct trunkIKApp: App {
+    
     @State private var appModel = AppModel()
     @State private var shapes = Shapes()
-    @State private var trunkState = TrunkState()
+    
     @State private var appStateManager = AppStateManager()
 
     // State properties for position and rotation confirmation
     @State private var isPositionConfirmed = false
     @State private var isRotationConfirmed = false
+    
+    // Initialize the system here
+    init() {
+        IKTargetPositionerSystem.registerSystem()
+        print("IKTargetPositionerSystem registered")
+    }
 
     var body: some SwiftUI.Scene {
         WindowGroup {
@@ -72,7 +88,7 @@ struct trunkIKApp: App {
             )
             .environment(appModel)
             .environment(shapes)
-            .environment(trunkState)
+            .environmentObject(DataManager.shared.trunkState)
             .environment(appStateManager)
         }
 
@@ -83,10 +99,11 @@ struct trunkIKApp: App {
             )
             .environment(appModel)
             .environment(shapes)
-            .environment(trunkState)
+            .environmentObject(DataManager.shared.trunkState)
             .environment(appStateManager)
             .onAppear {
                 appModel.immersiveSpaceState = .open
+                appModel.startServer()
             }
             .onDisappear {
                 appModel.immersiveSpaceState = .closed

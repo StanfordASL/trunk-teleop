@@ -9,6 +9,77 @@ import SwiftUI
 import RealityKit
 import RealityKitContent
 
+struct ToggleGripperButton: View {
+
+    @StateObject var trunkState = DataManager.shared.trunkState
+    @State private var gripperButtonLabel: String = "Open Gripper"
+
+    var body: some View {
+        Button {
+            trunkState.isGripperOpen.toggle()
+            gripperButtonLabel = (trunkState.isGripperOpen ? "Close Gripper" : "Open Gripper")
+            print("gripper open?: ")
+            print(trunkState.isGripperOpen)
+        } label: {
+            Text(gripperButtonLabel)
+        }
+        .fontWeight(.semibold)
+    }
+}
+
+struct ToggleStreamingButton: View {
+
+    @StateObject var trunkState = DataManager.shared.trunkState
+    @State private var streamingButtonLabel: String = "Start Streaming"
+    @State private var backgroundColor: Color = .clear
+    @State private var appModel = AppModel()
+
+    var body: some View {
+        Button {
+            // TODO: add stopsServer else
+            trunkState.isStreaming.toggle()
+            streamingButtonLabel = (trunkState.isStreaming ? "Stop Streaming" : "Start Streaming")
+            backgroundColor = (trunkState.isStreaming ? .green : .clear)
+            print(trunkState.isStreaming)
+            if trunkState.isStreaming {
+                            print("starting stream")
+                            appModel.startServer()
+                        }
+        } label: {
+            Text(streamingButtonLabel)
+            // add effect if streaming is on (green button)
+        }
+        .fontWeight(.semibold)
+        .background(backgroundColor)
+        .foregroundColor(.white)
+        .cornerRadius(20)
+    }
+}
+
+struct ToggleRecordingButton: View {
+
+    @StateObject var trunkState = DataManager.shared.trunkState
+    @State private var recordingButtonLabel: String = "Start Recording"
+    @State private var backgroundColor: Color = .clear
+
+    var body: some View {
+        Button {
+             // you can only use the recording button when streaming is running
+            trunkState.isRecording.toggle()
+            recordingButtonLabel = (trunkState.isRecording ? "Stop Recording" : "Start Recording")
+            backgroundColor = (trunkState.isRecording ? .red : .clear)
+            print("recording: ")
+            print(trunkState.isRecording)
+        } label: {
+            Text(recordingButtonLabel)
+            // add effect if recording is on (red button)
+        }
+        .fontWeight(.semibold)
+        .background(backgroundColor)
+        .foregroundColor(.white)
+        .cornerRadius(20)
+    }
+}
 
 struct ContentView: View {
     @Environment(AppStateManager.self) var appStateManager: AppStateManager
@@ -28,30 +99,37 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Text("Welcome to ASL TrunkTeleop!")
-                .font(.title) // Use .title2 or .title3 for smaller titles
+                .font(.largeTitle) // Use .title2 or .title3 for smaller titles
                 .fontWeight(.bold)
                 .padding()
             Text("You're on IP address [\(getIPAddress())]")
-                .font(.title2)
+                .font(.title)
             
             .environment(shapes)
             //will this work
                 .onAppear{
                     if runCount == 0 {
-                        // try accessing this as a struct: Type '()' cannot conform to 'View', Only concrete types such as structs, enums and classes can conform to protocols,Required by static method 'buildExpression' where 'Content' = '()'
                         initialOrientation = shapes.baseEntity.orientation
                         initialPosition = shapes.baseEntity.position
                         }
                 }
             
+            ToggleImmersiveSpaceButton()
+            .padding()
+            .padding()
+            .padding()
+            
             
             // Positioning mode
             if appModel.immersiveSpaceState == .open && !isPositionConfirmed {
                 Text("Look at the white ball and pinch your fingers to select")
+                    .font(.title)
                 Text(" ")
                 Text("Drag the white ball to the trunk origin")
+                    .font(.title)
                 Text(" ")
                 Text("Click 'Confirm Position' when set")
+                    .font(.title)
                 Text(" ")
                 
                 Button("Confirm Position") {
@@ -65,16 +143,18 @@ struct ContentView: View {
                 .cornerRadius(10)
             }
             
-            ToggleImmersiveSpaceButton()
             
             // Rotating mode
             if isPositionConfirmed && !isRotationConfirmed {
                 VStack {
                     Text("Pinch and drag the slider to adjust trunk rotation")
+                        .font(.title)
                     Text(" ")
-                    Text("The long axis should point to the back of the enclosure and the short axis should point to the left of the enclosure")
+                    Text("Point the long axis to the back of the enclosure and the short axis to the left of the enclosure")
+                        .font(.title)
                     Text(" ")
                     Text("Click 'Confirm Rotation' when set")
+                        .font(.title)
                     Text(" ")
                     Slider(value: $yRotationAngle, in: 0...360, step: 1) {
                         Text("Rotation Angle")
@@ -116,9 +196,17 @@ struct ContentView: View {
                     yRotationAngle = 0.0
                     runCount += 1
                     // maybe add more, like setting the position and rotation of the turnk to initial values (saved above), and potentially another button for resetting the angles
-                    
+                
                 }
                 .padding()
+                ToggleGripperButton()
+                .padding()
+                ToggleStreamingButton()
+                .padding()
+                ToggleRecordingButton()
+                
+                //TODO: right now recording button is still available even when streaming is off, although recording is impossible without streaming. Fix this in the future, but @StateObject variables do not update in swiftUI view (I think)
+                
             }
         }
         .padding()

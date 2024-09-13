@@ -39,12 +39,17 @@ struct Disktracking_DiskPosition: Sendable {
 }
 
 /// The DiskPositions message holds a map of disk IDs to positions.
+/// it also holds isGripperOpen and isRecording
 struct Disktracking_DiskPositions: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var diskPositions: Dictionary<String,Disktracking_DiskPosition> = [:]
+
+  var isGripperOpen: Bool = false
+
+  var isRecording: Bool = false
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -110,6 +115,8 @@ extension Disktracking_DiskPositions: SwiftProtobuf.Message, SwiftProtobuf._Mess
   static let protoMessageName: String = _protobuf_package + ".DiskPositions"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "disk_positions"),
+    2: .same(proto: "isGripperOpen"),
+    3: .same(proto: "isRecording"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -119,6 +126,8 @@ extension Disktracking_DiskPositions: SwiftProtobuf.Message, SwiftProtobuf._Mess
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disktracking_DiskPosition>.self, value: &self.diskPositions) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self.isGripperOpen) }()
+      case 3: try { try decoder.decodeSingularBoolField(value: &self.isRecording) }()
       default: break
       }
     }
@@ -128,11 +137,19 @@ extension Disktracking_DiskPositions: SwiftProtobuf.Message, SwiftProtobuf._Mess
     if !self.diskPositions.isEmpty {
       try visitor.visitMapField(fieldType: SwiftProtobuf._ProtobufMessageMap<SwiftProtobuf.ProtobufString,Disktracking_DiskPosition>.self, value: self.diskPositions, fieldNumber: 1)
     }
+    if self.isGripperOpen != false {
+      try visitor.visitSingularBoolField(value: self.isGripperOpen, fieldNumber: 2)
+    }
+    if self.isRecording != false {
+      try visitor.visitSingularBoolField(value: self.isRecording, fieldNumber: 3)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Disktracking_DiskPositions, rhs: Disktracking_DiskPositions) -> Bool {
     if lhs.diskPositions != rhs.diskPositions {return false}
+    if lhs.isGripperOpen != rhs.isGripperOpen {return false}
+    if lhs.isRecording != rhs.isRecording {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

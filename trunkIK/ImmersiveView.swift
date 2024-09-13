@@ -9,23 +9,6 @@ import SwiftUI
 import RealityKit
 import RealityKitContent
 
-// TODO:
-
-// need:
-// 2) have a reset button to go back to beginning state
-// 3) readout xyz values of each disk [simd31, simd3_2, simd3_3] in mocap space where the origin is at the trunk base
-// 4) implement streaming on mac
-// 5) set up AVP streaming ros node on Dell
-
-// nice to have:
-// - add gripper functionality (activate gripper button and distance between hands)
-// - think about different ways to orient (ask luis and hugo this afternoon)
-// - make sure segment lengths are exactly correct
-
-// Before Marco's Demo:
-// - 3D scan for world anchoring of the trunk
-// - Full Gripper position streaming functionality (with ros)
-
 
 /// Stores the name of an IK constraint and its target position, along with an optional helper entity for visualizing the target position.
 struct IKTargetPositionerComponent: Component {
@@ -91,7 +74,8 @@ struct ImmersiveView: View {
     
     @State var skeletonContainerEntity: ModelEntity = ModelEntity()
     
-
+    // Access shared queue via DataManager
+    let diskPositionsQueue = DataManager.shared.diskPositionsQueue
     
     let maxPositions = 10 // Define the number of positions to average - 3 is still shaky, 10 is too delayed
     
@@ -105,17 +89,21 @@ struct ImmersiveView: View {
                 shapes.rootJoint.name = "root"
                 shapes.rootJoint.setParent(shapes.baseEntity)
                 
+                // Y offsets for 200g from mocap data:
+                //-0.10665, -0.20432, -0.320682
+                
+                
                 shapes.disk1.setParent(shapes.rootJoint)
                 shapes.disk1.name = "disk1"
-                shapes.disk1.position = [0, -0.12, 0]
+                shapes.disk1.position = [0, -0.10665, 0]
                 
                 shapes.disk2.setParent(shapes.disk1)
                 shapes.disk2.name = "disk2"
-                shapes.disk2.position = [0, -0.12, 0]
+                shapes.disk2.position = [0, -0.09767, 0]
                 
                 shapes.disk3.setParent(shapes.disk2)
                 shapes.disk3.name = "disk3"
-                shapes.disk3.position = [0, -0.12, 0]
+                shapes.disk3.position = [0, -0.116362, 0]
                 
                 
                 shapes.positionSetEntity.setParent(shapes.baseEntity)
@@ -131,9 +119,11 @@ struct ImmersiveView: View {
                 shapes.z_axis.name = "z_axis"
                 
                 // Initialize disk positions
-                trunkState.diskPositions["disk1"] = toOptiTrackCoords(coords: shapes.disk1.position(relativeTo: shapes.baseEntity))
-                trunkState.diskPositions["disk2"] = toOptiTrackCoords(coords: shapes.disk2.position(relativeTo: shapes.baseEntity))
-                trunkState.diskPositions["disk3"] = toOptiTrackCoords(coords: shapes.disk3.position(relativeTo: shapes.baseEntity))
+                diskPositionsQueue.async {
+                    trunkState.diskPositions["disk1"] = toOptiTrackCoords(coords: shapes.disk1.position(relativeTo: shapes.baseEntity))
+                    trunkState.diskPositions["disk2"] = toOptiTrackCoords(coords: shapes.disk2.position(relativeTo: shapes.baseEntity))
+                    trunkState.diskPositions["disk3"] = toOptiTrackCoords(coords: shapes.disk3.position(relativeTo: shapes.baseEntity))
+                }
 //                print(trunkState.diskPositions)
                              
                 content.add(shapes.baseEntity)
@@ -348,12 +338,14 @@ struct ImmersiveView: View {
                             skeletonContainerEntity.components[IKTargetPositionerComponent.self]?.targetPosition = currentHandPosition
                             //print("Updated target position in IKTargetPositionerComponent")
                             
-                            // update disk positions
-                            trunkState.diskPositions["disk1"] = toOptiTrackCoords(coords: shapes.disk1.position(relativeTo: shapes.baseEntity))
-                            trunkState.diskPositions["disk2"] = toOptiTrackCoords(coords: shapes.disk2.position(relativeTo: shapes.baseEntity))
-                            trunkState.diskPositions["disk3"] = toOptiTrackCoords(coords: shapes.disk3.position(relativeTo: shapes.baseEntity))
-                            print("gesture disk positions: ")
-                            print(trunkState.diskPositions)
+                            diskPositionsQueue.async {
+                                // update disk positions
+                                trunkState.diskPositions["disk1"] = toOptiTrackCoords(coords: shapes.disk1.position(relativeTo: shapes.baseEntity))
+                                trunkState.diskPositions["disk2"] = toOptiTrackCoords(coords: shapes.disk2.position(relativeTo: shapes.baseEntity))
+                                trunkState.diskPositions["disk3"] = toOptiTrackCoords(coords: shapes.disk3.position(relativeTo: shapes.baseEntity))
+                                //                            print("gesture disk positions: ")
+                                //                            print(trunkState.diskPositions)
+                            }
                         }
                     }
             )

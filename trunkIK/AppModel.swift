@@ -80,12 +80,18 @@ class DataManager {
     
     var trunkState = TrunkState()
     
+    // Shared queue for diskPositions
+    let diskPositionsQueue = DispatchQueue(label: "aslTrunk.trunkIK.diskPositionsQueue")
+        
+    
     private init() {}
 }
 
 class DiskTrackingServiceProvider: Disktracking_DiskTrackingServiceProvider {
     var interceptors: Disktracking_DiskTrackingServiceServerInterceptorFactoryProtocol?
     var trunkState: TrunkState
+
+    let diskPositionsQueue = DataManager.shared.diskPositionsQueue // Use shared queue
 
     init(trunkState: TrunkState) {
         self.trunkState = trunkState
@@ -110,14 +116,25 @@ class DiskTrackingServiceProvider: Disktracking_DiskTrackingServiceProvider {
     private func fillDiskPositions() -> Disktracking_DiskPositions {
         var diskPositions = Disktracking_DiskPositions()
 
-        for (id, position) in trunkState.diskPositions {
-            print("Current \(id) Position: \(position)")
-            let diskPosition = Disktracking_DiskPosition.with {
-                $0.id = id
-                $0.position = [position.x, position.y, position.z]
+        diskPositionsQueue.sync {
+            for (id, position) in trunkState.diskPositions {
+                //print("Current \(id) Position: \(position)")
+                let diskPosition = Disktracking_DiskPosition.with {
+                    $0.id = id
+                    $0.position = [position.x, position.y, position.z]
+                    
+                }
+                diskPositions.diskPositions[id] = diskPosition
             }
-            diskPositions.diskPositions[id] = diskPosition
+            
+            
+            
+            diskPositions.isRecording = trunkState.isRecording
+            diskPositions.isGripperOpen = trunkState.isGripperOpen
+            
         }
+        print("sending gripper open state?:")
+                    print(trunkState.isGripperOpen)
 
         return diskPositions
     }

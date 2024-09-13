@@ -48,6 +48,15 @@ class TrunkState: ObservableObject{
                                                   "disk2": SIMD3<Float>(0,0,0),
                                                   "disk3": SIMD3<Float>(0,0,0)]
     
+    // true if gripper is open, false if gripper is closed
+    var isGripperOpen: Bool = false
+    
+    // true if you want to stream data over wifi to python/ROS to run on robot, false otherwise
+    var isStreaming: Bool = false
+    // run appmodel.startserver() to change this
+
+    // true if you want to record a trajectory to a csv file in python, false otherwise
+    var isRecording: Bool = false
 }
 
 enum AppState {
@@ -103,7 +112,7 @@ struct trunkIKApp: App {
             .environment(appStateManager)
             .onAppear {
                 appModel.immersiveSpaceState = .open
-                appModel.startServer()
+                // appModel.startServer
             }
             .onDisappear {
                 appModel.immersiveSpaceState = .closed

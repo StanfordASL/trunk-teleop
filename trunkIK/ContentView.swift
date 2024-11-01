@@ -18,14 +18,15 @@ struct ToggleGripperButton: View {
         Button {
             trunkState.isGripperOpen.toggle()
             gripperButtonLabel = (trunkState.isGripperOpen ? "Close Gripper" : "Open Gripper")
-            print("gripper open?: ")
-            print(trunkState.isGripperOpen)
+            //print("gripper open?: ")
+            //print(trunkState.isGripperOpen)
         } label: {
             Text(gripperButtonLabel)
         }
         .fontWeight(.semibold)
     }
 }
+
 
 struct ToggleStreamingButton: View {
 
@@ -45,6 +46,10 @@ struct ToggleStreamingButton: View {
                             print("starting stream")
                             appModel.startServer()
                         }
+            else {
+                // need to actually implement deinit of server - this is where memory issues come from
+                print("stopping server")
+            }
         } label: {
             Text(streamingButtonLabel)
             // add effect if streaming is on (green button)
@@ -102,6 +107,7 @@ struct ContentView: View {
                 .font(.largeTitle) // Use .title2 or .title3 for smaller titles
                 .fontWeight(.bold)
                 .padding()
+            // Commented out for SRC
             Text("You're on IP address [\(getIPAddress())]")
                 .font(.title)
             
@@ -115,8 +121,6 @@ struct ContentView: View {
                 }
             
             ToggleImmersiveSpaceButton()
-            .padding()
-            .padding()
             .padding()
             
             
@@ -165,6 +169,8 @@ struct ContentView: View {
                         isRotationConfirmed = true
                         appStateManager.currentState = .interaction
                         updateHoverEffects(for: shapes, state: appStateManager.currentState)
+                        // ADDED FOR SRC DEMO, just set streaming to always be true
+                        //trunkState.isStreaming = true
                         print("current state: interaction")
                         
                     }
@@ -179,31 +185,41 @@ struct ContentView: View {
                 }
             }
             
-            // Reset to positioning mode
+            // operation mode
             if isPositionConfirmed && isRotationConfirmed {
-                Button("Redo Calibration") {
+                Button("Redo Calibration") { // reset to positioning mode
                     isRotationConfirmed = false
                     isPositionConfirmed = false
                     appStateManager.currentState = .positioning
                     updateHoverEffects(for: shapes, state: appStateManager.currentState)
                     
                     shapes.baseEntity.orientation = initialOrientation
-                    shapes.baseEntity.position = initialPosition
+                    shapes.baseEntity.position = trunkState.lastBasePosition ?? [0, 1.5, -1]//[0, 1.5, -1] is og position
                     
                     trunkState.lastBasePosition = nil
                     trunkState.recentBasePositions = []
                     
                     yRotationAngle = 0.0
                     runCount += 1
-                    // maybe add more, like setting the position and rotation of the turnk to initial values (saved above), and potentially another button for resetting the angles
+                    // maybe add more, like setting the position and rotation of the trunk to initial values (saved above), and potentially another button for resetting the angles
                 
                 }
-                .padding()
+                // added for src
+                Spacer().frame(height: 100)
+                Text("Look at the lowest disk and pinch your fingers and drag to control the trunk")
+                    .font(.title)
+                
+                // COMMENTED FOR SRC DEMO, STREAMING ALWAYS OCCURS ONCE ENVIRONMENT IS ENTERED
+//                .padding()
+//                ToggleStreamingButton()
+                // ADDED FOR SRC DEMO, STREAMING ALWAYS OCCURS ONCE ENVIRONMENT IS ENTERED
+
+                Spacer().frame(height: 100) // Adjust the height as needed
                 ToggleGripperButton()
-                .padding()
-                ToggleStreamingButton()
-                .padding()
-                ToggleRecordingButton()
+                
+                // COMMENTED THIS FOR SRC DEMO, RECORDING NOT NECESSARY
+//                .padding()
+//                ToggleRecordingButton()
                 
                 //TODO: right now recording button is still available even when streaming is off, although recording is impossible without streaming. Fix this in the future, but @StateObject variables do not update in swiftUI view (I think)
                 
@@ -223,7 +239,7 @@ func updateHoverEffects(for shapes: Shapes, state: AppState) {
                
        let shape: ShapeResource = ShapeResource.generateCapsule(
                                           height: bounds.extents.y,
-                                          radius: bounds.boundingRadius / 2)
+                                          radius: bounds.boundingRadius) // doubled the bounding radius
                                    .offsetBy(translation: [0, 0, 0])
                                       
        let collision = CollisionComponent(shapes: [shape],

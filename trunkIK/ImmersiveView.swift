@@ -55,6 +55,57 @@ struct IKTargetPositionerSystem: System {
     }
 }
 
+//struct IKTargetPositionerSystem: System {
+//    let query: EntityQuery = EntityQuery(where: .has(IKTargetPositionerComponent.self))
+//    
+//    init(scene: RealityKit.Scene) {}
+//
+//    func update(context: SceneUpdateContext) {
+//        // Define the center and radius for the hemisphere
+//        guard let disk2Position = context.scene.findEntity(named: "disk2")?.position(relativeTo: nil),
+//              let disk3Position = context.scene.findEntity(named: "disk3")?.position(relativeTo: nil) else {
+//            return
+//        }
+//
+//        let hemisphereCenter = disk2Position
+//        let hemisphereRadius = Float(0.116362) // Adding a margin if desired
+//
+//        // Get all entities with an `IKTargetPositionerComponent`.
+//        let entities = context.entities(matching: self.query, updatingSystemWhen: .rendering)
+//        
+//        for entity in entities {
+//            // Get the necessary IK components attached to the entity.
+//            guard let ikComponent = entity.components[IKComponent.self],
+//                  var ikTargetPositionerComponent = entity.components[IKTargetPositionerComponent.self] else {
+//                assertionFailure("Entity is missing required IK components.")
+//                return
+//            }
+//
+//            // Get the target position and check if it falls within the hemisphere
+//            var targetPosition = ikTargetPositionerComponent.targetPosition
+//            let vectorToTarget = targetPosition - hemisphereCenter
+//            let distanceToTarget = simd_length(vectorToTarget)
+//
+//            // Check if the position is outside the hemisphere bounds
+//            if distanceToTarget > hemisphereRadius || vectorToTarget.y > 0 {
+//                // Clamp to the nearest point on the hemisphere
+//                let clampedVector = (vectorToTarget / distanceToTarget) * hemisphereRadius
+//                targetPosition = hemisphereCenter + clampedVector
+//                targetPosition.y = min(targetPosition.y, hemisphereCenter.y) // Ensure it's within the lower hemisphere
+//            }
+//
+//            // Update the target position for IK and visualizer entity
+//            ikComponent.solvers[0].constraints[ikTargetPositionerComponent.targetConstraintName]!.target.translation = targetPosition
+//            ikTargetPositionerComponent.targetVisualizerEntity?.position = targetPosition
+//
+//            // Apply component changes.
+//            entity.components.set(ikComponent)
+//            entity.components.set(ikTargetPositionerComponent)
+//        }
+//    }
+//}
+
+
 
 struct ImmersiveView: View {
     // for operation
@@ -263,13 +314,12 @@ struct ImmersiveView: View {
                 
                 
                 // Create a helper entity to visualize the target position.
-                let targetVisualizerEntity = ModelEntity(mesh: .generateSphere(radius: 0.015), materials: [SimpleMaterial(color: .magenta, isMetallic: false)])
-                targetVisualizerEntity.components.set(OpacityComponent(opacity: 0.5))
-                targetVisualizerEntity.setParent(skeletonContainerEntity)
+                shapes.targetVisualizerEntity.components.set(OpacityComponent(opacity: 0.5))
+                shapes.targetVisualizerEntity.setParent(skeletonContainerEntity)
                 // Create the IK target positioner component and add it to the skeleton container entity.
                 skeletonContainerEntity.components.set(IKTargetPositionerComponent(targetConstraintName: disk3ConstraintName,
                                                                                    targetPosition: shapes.disk3.position(relativeTo: skeletonContainerEntity),
-                                                                                   targetVisualizerEntity: targetVisualizerEntity))
+                                                                                   targetVisualizerEntity: shapes.targetVisualizerEntity))
                 
                 // TODO: just adding another component doesnt work, maybe add this as a list of constraint names, positions, and entities and it will work
                 

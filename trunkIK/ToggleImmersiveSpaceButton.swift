@@ -9,10 +9,12 @@ import SwiftUI
 
 struct ToggleImmersiveSpaceButton: View {
 
+    @Environment(AppStateManager.self) var appStateManager: AppStateManager
     @Environment(AppModel.self) private var appModel
 
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
+    @StateObject var trunkState = DataManager.shared.trunkState
 
     var body: some View {
         Button {
@@ -20,6 +22,7 @@ struct ToggleImmersiveSpaceButton: View {
                 switch appModel.immersiveSpaceState {
                     case .open:
                         appModel.immersiveSpaceState = .inTransition
+//                        appStateManager.currentState = .positioning //added for SRC, idk if this really does anything. keep?
                         await dismissImmersiveSpace()
                         // Don't set immersiveSpaceState to .closed because there
                         // are multiple paths to ImmersiveView.onDisappear().

@@ -27,6 +27,8 @@ import RealityKit
     var parent1 = Entity()
     var parent2 = Entity()
     var parent3 = Entity()
+    
+    var targetVisualizerEntity = ModelEntity(mesh: .generateSphere(radius: 0.015), materials: [SimpleMaterial(color: .magenta, isMetallic: false)])
 
 }
 
@@ -85,7 +87,13 @@ struct trunkIKApp: App {
     init() {
         IKTargetPositionerSystem.registerSystem()
         print("IKTargetPositionerSystem registered")
+        
+        // added for SRC - start the streaming here over the server
+        appModel.startServer()
+        print("server initialized")
     }
+    
+    
 
     var body: some SwiftUI.Scene {
         WindowGroup {

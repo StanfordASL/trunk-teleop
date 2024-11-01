@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "trunk.png",
       "idiom" : "vision",
       "scale" : "2x"
     }

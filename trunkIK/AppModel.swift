@@ -49,6 +49,7 @@ class AppModel {
             await self.setupServer()
         }
     }
+    
 
     private func setupServer() async {
         let provider = DiskTrackingServiceProvider(trunkState: trunkState)
@@ -67,12 +68,13 @@ class AppModel {
     }
 
     deinit {
-        Task {
-            try? await server?.close().get()
-            try? await group.shutdownGracefully()
+        Task { [weak self] in
+            try? await self?.server?.close().get()
+            try? await self?.group.shutdownGracefully()
         }
     }
 }
+
 
 
 class DataManager {
@@ -102,8 +104,8 @@ class DiskTrackingServiceProvider: Disktracking_DiskTrackingServiceProvider {
         context: StreamingResponseCallContext<Disktracking_DiskPositions>
     ) -> EventLoopFuture<GRPCStatus> {
         let eventLoop = context.eventLoop
-
-        let task = eventLoop.scheduleRepeatedAsyncTask(initialDelay: .milliseconds(10), delay: .milliseconds(100)) { task -> EventLoopFuture<Void> in
+        // delay was 100ms = 10Hz, changed to 10ms = 100Hz
+        let task = eventLoop.scheduleRepeatedAsyncTask(initialDelay: .milliseconds(10), delay: .milliseconds(10)) { task -> EventLoopFuture<Void> in
             let diskPositions = self.fillDiskPositions()
             //print("Sending disk positions...")
             return context.sendResponse(diskPositions).map { _ in }
@@ -133,8 +135,8 @@ class DiskTrackingServiceProvider: Disktracking_DiskTrackingServiceProvider {
             diskPositions.isGripperOpen = trunkState.isGripperOpen
             
         }
-        print("sending gripper open state?:")
-                    print(trunkState.isGripperOpen)
+        //print("sending gripper open state?:")
+        //  print(trunkState.isGripperOpen)
 
         return diskPositions
     }
